@@ -580,7 +580,8 @@ button.cell {
   margin-top: 12px;
 }
 
-.free-text-field[hidden] {
+.free-text-field[hidden],
+#free-field[hidden] {
   display: none;
 }
 

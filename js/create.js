@@ -4,7 +4,7 @@ const form = document.getElementById('create-form');
 const titleInput = document.getElementById('title');
 const sizeSelect = document.getElementById('size');
 const freeToggle = document.getElementById('free-toggle');
-const freeHint = document.getElementById('free-hint');
+const freeField = document.getElementById('free-field');
 const freeTextField = document.getElementById('free-text-field');
 const freeTextInput = document.getElementById('free-text');
 const itemsInput = document.getElementById('items');
@@ -67,10 +67,9 @@ function updateStatus() {
   const size = Number(sizeSelect.value);
   const hasCenter = centerIndex(size) >= 0;
 
-  // 4×4は中央のマスがないのでFREEを選べない
-  freeToggle.disabled = !hasCenter;
-  freeHint.textContent = hasCenter ? '' : '4×4には中央のマスがないため、FREEマスは使えません';
-  freeTextField.hidden = !hasCenter || !freeToggle.checked;
+  // 4×4は中央のマスがないのでFREEの設定ごと隠す
+  freeField.hidden = !hasCenter;
+  freeTextField.hidden = !freeToggle.checked;
 
   const bingo = currentBingo();
   const items = getItems();
