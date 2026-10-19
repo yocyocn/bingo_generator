@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="white">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ビンゴを作る | Share Bingo</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html">Share Bingo</a>
+  </header>
+
+  <main>
+    <h1 class="page-title">ビンゴを作る</h1>
+
+    <form id="create-form" class="card form" novalidate>
+      <div class="field">
+        <label for="title">ビンゴ名</label>
+        <input type="text" id="title" maxlength="40" placeholder="例：忘年会あるあるビンゴ" autocomplete="off">
+        <p class="field-error" id="title-error"></p>
+      </div>
+
+      <div class="field">
+        <label for="size">マスの数</label>
+        <select id="size">
+          <option value="3">3 × 3</option>
+          <option value="4">4 × 4</option>
+          <option value="5" selected>5 × 5</option>
+        </select>
+        <p class="field-hint" id="size-hint"></p>
+      </div>
+
+      <div class="field">
+        <label for="items">ビンゴの項目 <span class="label-note">1行に1つ・20文字まで</span></label>
+        <textarea id="items" rows="10" placeholder="例：&#10;乾杯の挨拶が長い&#10;誰かが歌い出す&#10;二次会の話が出る"></textarea>
+        <div class="items-meta">
+          <span id="items-count"></span>
+        </div>
+        <ul class="field-error-list" id="items-error"></ul>
+      </div>
+
+      <fieldset class="field">
+        <legend>カラー</legend>
+        <div class="theme-picker" id="theme-picker"></div>
+      </fieldset>
+
+      <button type="submit" class="button button-primary button-block">シェア</button>
+    </form>
+  </main>
+
+  <script src="js/common.js"></script>
+  <script src="js/create.js"></script>
+</body>
+</html>
