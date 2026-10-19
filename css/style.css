@@ -288,6 +288,20 @@ textarea:focus,
   border-color: var(--primary);
 }
 
+.button-icon {
+  flex: none;
+  margin-left: 6px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 .button-block {
   display: flex;
   width: 100%;
