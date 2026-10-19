@@ -40,18 +40,26 @@ function freeIndex(bingo) {
   return bingo.free === null ? -1 : centerIndex(bingo.size);
 }
 
-function requiredCount(bingo) {
-  return bingo.size * bingo.size - (freeIndex(bingo) >= 0 ? 1 : 0);
+// 中央マスの内容が決まっている（FREEか、中央マス専用の項目がある）ときはその位置。なければ -1
+function fixedCenterIndex(bingo) {
+  return bingo.free !== null || bingo.center ? centerIndex(bingo.size) : -1;
 }
 
-// 盤面のマス配列を作る。FREEマス以外に入力順で項目を入れ、足りない分は空白
+function requiredCount(bingo) {
+  return bingo.size * bingo.size - (fixedCenterIndex(bingo) >= 0 ? 1 : 0);
+}
+
+// 盤面のマス配列を作る。中央以外に入力順で項目を入れ、足りない分は空白
 function buildCells(bingo) {
   const free = freeIndex(bingo);
+  const center = fixedCenterIndex(bingo);
   const cells = [];
   let next = 0;
   for (let i = 0; i < bingo.size * bingo.size; i++) {
     if (i === free) {
       cells.push({ free: true, text: bingo.free || DEFAULT_FREE_TEXT });
+    } else if (i === center) {
+      cells.push({ free: false, text: bingo.center });
     } else {
       cells.push({ free: false, text: bingo.items[next++] || '' });
     }
@@ -71,14 +79,15 @@ function countBingo(size, marks) {
 
 // クエリパラメータ
 //   t: ビンゴ名 / s: サイズ / i: 項目（改行区切り） / c: テーマ / f: FREEマスの表示内容（なければFREEなし）
-//   m: 結果（マスごとに0か1） / n: コメント
-function buildQuery({ title, size, items, theme, free }, marks, comment) {
+//   x: 中央マスの項目（FREEなしのとき） / m: 結果（マスごとに0か1） / n: コメント
+function buildQuery({ title, size, items, theme, free, center }, marks, comment) {
   const params = new URLSearchParams();
   params.set('t', title);
   params.set('s', String(size));
   params.set('i', items.join('\n'));
   params.set('c', theme);
   if (free !== null) params.set('f', free);
+  else if (center) params.set('x', center);
   if (marks) params.set('m', marks.map((m) => (m ? '1' : '0')).join(''));
   if (comment) params.set('n', comment);
   return params.toString();
@@ -111,6 +120,7 @@ function parseBingo(search) {
     items,
     theme: params.get('c') || DEFAULT_THEME,
     free: rawFree === null ? null : truncate(rawFree.trim(), MAX_ITEM_LENGTH) || DEFAULT_FREE_TEXT,
+    center: rawFree === null ? truncate((params.get('x') || '').trim(), MAX_ITEM_LENGTH) : '',
     comment: truncate(params.get('n') || '', MAX_COMMENT_LENGTH),
     hasMarks: params.has('m'),
   };

@@ -5,8 +5,8 @@ const titleInput = document.getElementById('title');
 const sizeSelect = document.getElementById('size');
 const freeToggle = document.getElementById('free-toggle');
 const freeField = document.getElementById('free-field');
-const freeTextField = document.getElementById('free-text-field');
-const freeTextInput = document.getElementById('free-text');
+const centerTextField = document.getElementById('center-text-field');
+const centerTextInput = document.getElementById('center-text');
 const itemsInput = document.getElementById('items');
 const titleError = document.getElementById('title-error');
 const itemsCount = document.getElementById('items-count');
@@ -57,7 +57,8 @@ function currentBingo() {
     size,
     items: getItems(),
     theme,
-    free: hasCenter && freeToggle.checked ? freeTextInput.value.trim() || DEFAULT_FREE_TEXT : null,
+    free: hasCenter && freeToggle.checked ? DEFAULT_FREE_TEXT : null,
+    center: hasCenter && !freeToggle.checked ? truncate(centerTextInput.value.trim(), MAX_ITEM_LENGTH) : '',
   };
   bingo.items = bingo.items.slice(0, requiredCount(bingo));
   return bingo;
@@ -69,7 +70,8 @@ function updateStatus() {
 
   // 4×4は中央のマスがないのでFREEの設定ごと隠す
   freeField.hidden = !hasCenter;
-  freeTextField.hidden = !freeToggle.checked;
+  // FREEにしないときは中央マスの項目を入力できる
+  centerTextField.hidden = freeToggle.checked;
 
   const bingo = currentBingo();
   const items = getItems();
@@ -119,7 +121,7 @@ function validBingo() {
 }
 
 [sizeSelect, freeToggle].forEach((el) => el.addEventListener('change', updateStatus));
-[itemsInput, freeTextInput].forEach((el) => el.addEventListener('input', updateStatus));
+[itemsInput, centerTextInput].forEach((el) => el.addEventListener('input', updateStatus));
 titleInput.addEventListener('input', () => {
   titleError.textContent = '';
   titleInput.classList.remove('is-invalid');
