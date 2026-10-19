@@ -17,7 +17,7 @@ if (!bingo) {
   showLoadError('ビンゴを読み込めませんでした。URLが正しいか確認してください。');
 } else {
   bingo.theme = applyTheme(bingo.theme);
-  document.title = `${bingo.title} | Share Bingo`;
+  document.title = `${bingo.title} | Bingo Generator`;
   document.getElementById('bingo-title').textContent = bingo.title;
 
   const countEl = document.getElementById('bingo-count');

@@ -1,4 +1,4 @@
-# Share Bingo
+# Bingo Generator
 
 ブラウザだけで好きな項目のビンゴを作って、URLで共有できる静的サイトです。
 
