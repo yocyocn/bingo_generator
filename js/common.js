@@ -1,8 +1,10 @@
-// 3ページ共通の処理（URLの読み書き、盤面の描画、シェア用ポップアップ、テーマ）
+// 3ページ共通の処理（URLの読み書き、盤面の描画、ビンゴ判定、シェア用ポップアップ、テーマ）
 
 const SIZES = [3, 4, 5];
 const MAX_ITEM_LENGTH = 20;
 const MAX_TITLE_LENGTH = 40;
+const MAX_COMMENT_LENGTH = 100;
+const DEFAULT_FREE_TEXT = 'FREE';
 
 const THEMES = [
   { id: 'white', label: '白' },
@@ -18,41 +20,67 @@ function charLength(str) {
   return Array.from(str).length;
 }
 
+function truncate(str, max) {
+  return Array.from(str).slice(0, max).join('');
+}
+
 function applyTheme(theme) {
   const valid = THEMES.some((t) => t.id === theme) ? theme : DEFAULT_THEME;
   document.documentElement.dataset.theme = valid;
   return valid;
 }
 
-// 3×3と5×5は中央をFREEマスにする
+// 中央のマスがあるのは3×3と5×5だけ
 function centerIndex(size) {
   return size % 2 === 1 ? (size * size - 1) / 2 : -1;
 }
 
+// FREEマスの位置。FREEなし、または4×4のときは -1
+function freeIndex(bingo) {
+  return bingo.free === null ? -1 : centerIndex(bingo.size);
+}
+
+function requiredCount(bingo) {
+  return bingo.size * bingo.size - (freeIndex(bingo) >= 0 ? 1 : 0);
+}
+
 // 盤面のマス配列を作る。FREEマス以外に入力順で項目を入れ、足りない分は空白
-function buildCells(size, items) {
-  const center = centerIndex(size);
+function buildCells(bingo) {
+  const free = freeIndex(bingo);
   const cells = [];
   let next = 0;
-  for (let i = 0; i < size * size; i++) {
-    if (i === center) {
-      cells.push({ free: true, text: 'FREE' });
+  for (let i = 0; i < bingo.size * bingo.size; i++) {
+    if (i === free) {
+      cells.push({ free: true, text: bingo.free || DEFAULT_FREE_TEXT });
     } else {
-      cells.push({ free: false, text: items[next++] || '' });
+      cells.push({ free: false, text: bingo.items[next++] || '' });
     }
   }
   return cells;
 }
 
+// 縦・横・斜めで揃っている列の数
+function countBingo(size, marks) {
+  const lines = [];
+  for (let r = 0; r < size; r++) lines.push([...Array(size)].map((_, c) => r * size + c));
+  for (let c = 0; c < size; c++) lines.push([...Array(size)].map((_, r) => r * size + c));
+  lines.push([...Array(size)].map((_, i) => i * size + i));
+  lines.push([...Array(size)].map((_, i) => i * size + (size - 1 - i)));
+  return lines.filter((line) => line.every((i) => marks[i])).length;
+}
+
 // クエリパラメータ
-//   t: ビンゴ名 / s: サイズ / i: 項目（改行区切り） / c: テーマ / m: 結果（マスごとに0か1）
-function buildQuery({ title, size, items, theme }, marks) {
+//   t: ビンゴ名 / s: サイズ / i: 項目（改行区切り） / c: テーマ / f: FREEマスの表示内容（なければFREEなし）
+//   m: 結果（マスごとに0か1） / n: コメント
+function buildQuery({ title, size, items, theme, free }, marks, comment) {
   const params = new URLSearchParams();
   params.set('t', title);
   params.set('s', String(size));
   params.set('i', items.join('\n'));
   params.set('c', theme);
+  if (free !== null) params.set('f', free);
   if (marks) params.set('m', marks.map((m) => (m ? '1' : '0')).join(''));
+  if (comment) params.set('n', comment);
   return params.toString();
 }
 
@@ -73,26 +101,27 @@ function parseBingo(search) {
 
   const items = rawItems
     .split('\n')
-    .map((s) => Array.from(s.trim()).slice(0, MAX_ITEM_LENGTH).join(''))
+    .map((s) => truncate(s.trim(), MAX_ITEM_LENGTH))
     .filter((s) => s !== '');
 
-  const theme = params.get('c') || DEFAULT_THEME;
-
-  const center = centerIndex(size);
-  const rawMarks = params.get('m') || '';
-  const marks = [];
-  for (let i = 0; i < size * size; i++) {
-    marks.push(i === center || rawMarks[i] === '1');
-  }
-
-  return {
-    title: Array.from(title).slice(0, MAX_TITLE_LENGTH).join(''),
+  const rawFree = params.get('f');
+  const bingo = {
+    title: truncate(title, MAX_TITLE_LENGTH),
     size,
     items,
-    theme,
-    marks,
+    theme: params.get('c') || DEFAULT_THEME,
+    free: rawFree === null ? null : truncate(rawFree.trim(), MAX_ITEM_LENGTH) || DEFAULT_FREE_TEXT,
+    comment: truncate(params.get('n') || '', MAX_COMMENT_LENGTH),
     hasMarks: params.has('m'),
   };
+
+  const free = freeIndex(bingo);
+  const rawMarks = params.get('m') || '';
+  bingo.marks = [];
+  for (let i = 0; i < size * size; i++) {
+    bingo.marks.push(i === free || rawMarks[i] === '1');
+  }
+  return bingo;
 }
 
 // 盤面を描画する。onToggle を渡すとマスをクリックで切り替えられる
@@ -101,7 +130,7 @@ function renderBoard(container, bingo, marks, onToggle) {
   container.dataset.size = String(bingo.size);
   container.style.setProperty('--size', bingo.size);
 
-  buildCells(bingo.size, bingo.items).forEach((cell, index) => {
+  buildCells(bingo).forEach((cell, index) => {
     const el = document.createElement(onToggle && !cell.free ? 'button' : 'div');
     el.className = 'cell';
     if (cell.free) el.classList.add('is-free');
@@ -136,7 +165,7 @@ function showLoadError(message) {
   const link = document.createElement('a');
   link.className = 'button';
   link.href = 'index.html';
-  link.textContent = 'ビンゴを作る';
+  link.textContent = 'ビンゴを作ってみる';
   box.append(p, link);
   main.appendChild(box);
 }
@@ -157,6 +186,7 @@ async function copyText(text, input) {
   }
 }
 
+// heading を省略すると見出しなしで表示する
 function openShareModal(url, heading) {
   let modal = document.getElementById('share-modal');
   if (!modal) {
@@ -166,9 +196,9 @@ function openShareModal(url, heading) {
     modal.hidden = true;
     modal.innerHTML = `
       <div class="modal-backdrop" data-close></div>
-      <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="share-modal-title">
+      <div class="modal-dialog" role="dialog" aria-modal="true" aria-label="シェア用URL">
         <button type="button" class="modal-close" data-close aria-label="閉じる">×</button>
-        <h2 id="share-modal-title"></h2>
+        <h2 class="modal-title"></h2>
         <div class="share-row">
           <input type="text" class="share-url" readonly aria-label="シェア用URL">
           <button type="button" class="button button-primary share-copy">コピー</button>
@@ -193,7 +223,9 @@ function openShareModal(url, heading) {
     });
   }
 
-  modal.querySelector('#share-modal-title').textContent = heading;
+  const title = modal.querySelector('.modal-title');
+  title.textContent = heading || '';
+  title.hidden = !heading;
   modal.querySelector('.share-url').value = url;
   modal.querySelector('.share-status').textContent = '';
   modal.hidden = false;

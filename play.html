@@ -7,19 +7,25 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header class="site-header">
-    <a class="logo" href="index.html">Share Bingo</a>
-  </header>
-
   <main>
     <h1 class="page-title" id="bingo-title"></h1>
     <p class="page-lead">当てはまるマスをタップして ○ をつけよう</p>
 
     <div class="board" id="board"></div>
 
+    <p class="bingo-count" id="bingo-count" role="status" hidden></p>
+
+    <div class="card form comment-field">
+      <label for="comment">コメント <span class="label-note">100文字まで</span></label>
+      <textarea id="comment" rows="3" maxlength="100" placeholder="ひとことどうぞ"></textarea>
+      <p class="items-meta" id="comment-count"></p>
+    </div>
+
     <div class="actions">
       <button type="button" class="button button-primary button-block" id="share-result">結果をシェア</button>
     </div>
+
+    <p class="create-link"><a href="index.html">ビンゴを作ってみる</a></p>
   </main>
 
   <script src="js/common.js"></script>

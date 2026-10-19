@@ -7,15 +7,20 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header class="site-header">
-    <a class="logo" href="index.html">Share Bingo</a>
-  </header>
-
   <main>
     <p class="page-kicker">ビンゴの結果</p>
     <h1 class="page-title" id="bingo-title"></h1>
 
     <div class="board" id="board"></div>
+
+    <p class="bingo-count" id="bingo-count"></p>
+
+    <div class="card comment-display" id="comment-display" hidden>
+      <p class="comment-heading">コメント</p>
+      <p class="comment-text" id="comment-text"></p>
+    </div>
+
+    <p class="create-link"><a href="index.html">ビンゴを作ってみる</a></p>
   </main>
 
   <script src="js/common.js"></script>

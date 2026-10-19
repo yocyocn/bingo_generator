@@ -7,45 +7,66 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header class="site-header">
-    <a class="logo" href="index.html">Share Bingo</a>
-  </header>
-
-  <main>
+  <main class="main-wide">
     <h1 class="page-title">ビンゴを作る</h1>
 
-    <form id="create-form" class="card form" novalidate>
-      <div class="field">
-        <label for="title">ビンゴ名</label>
-        <input type="text" id="title" maxlength="40" placeholder="例：忘年会あるあるビンゴ" autocomplete="off">
-        <p class="field-error" id="title-error"></p>
-      </div>
-
-      <div class="field">
-        <label for="size">マスの数</label>
-        <select id="size">
-          <option value="3">3 × 3</option>
-          <option value="4">4 × 4</option>
-          <option value="5" selected>5 × 5</option>
-        </select>
-        <p class="field-hint" id="size-hint"></p>
-      </div>
-
-      <div class="field">
-        <label for="items">ビンゴの項目 <span class="label-note">1行に1つ・20文字まで</span></label>
-        <textarea id="items" rows="10" placeholder="例：&#10;乾杯の挨拶が長い&#10;誰かが歌い出す&#10;二次会の話が出る"></textarea>
-        <div class="items-meta">
-          <span id="items-count"></span>
+    <form id="create-form" class="create-layout" novalidate>
+      <div class="card form create-fields">
+        <div class="field">
+          <label for="title">ビンゴ名</label>
+          <input type="text" id="title" maxlength="40" placeholder="例：忘年会あるあるビンゴ" autocomplete="off">
+          <p class="field-error" id="title-error"></p>
         </div>
-        <ul class="field-error-list" id="items-error"></ul>
+
+        <div class="field">
+          <label for="size">マスの数</label>
+          <select id="size">
+            <option value="3">3 × 3</option>
+            <option value="4">4 × 4</option>
+            <option value="5" selected>5 × 5</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <div class="toggle-row">
+            <label class="toggle" for="free-toggle">
+              <input type="checkbox" id="free-toggle" role="switch" checked>
+              <span class="toggle-track" aria-hidden="true"></span>
+              <span class="toggle-label">中央をFREEマスにする</span>
+            </label>
+          </div>
+          <p class="field-hint" id="free-hint"></p>
+          <div class="free-text-field" id="free-text-field">
+            <label for="free-text" class="sub-label">FREEマスの表示内容 <span class="label-note">20文字まで</span></label>
+            <input type="text" id="free-text" maxlength="20" value="FREE" placeholder="FREE" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="items">ビンゴの項目 <span class="label-note">1行に1つ・20文字まで</span></label>
+          <textarea id="items" rows="10" placeholder="例：&#10;乾杯の挨拶が長い&#10;誰かが歌い出す&#10;二次会の話が出る"></textarea>
+          <div class="items-meta">
+            <span id="items-count"></span>
+          </div>
+          <ul class="field-error-list" id="items-error"></ul>
+        </div>
+
+        <fieldset class="field field-last">
+          <legend>カラー</legend>
+          <div class="theme-picker" id="theme-picker"></div>
+        </fieldset>
       </div>
 
-      <fieldset class="field">
-        <legend>カラー</legend>
-        <div class="theme-picker" id="theme-picker"></div>
-      </fieldset>
+      <section class="create-preview" aria-labelledby="preview-heading">
+        <h2 class="preview-heading" id="preview-heading">プレビュー</h2>
+        <p class="preview-title" id="preview-title"></p>
+        <div class="board" id="preview-board"></div>
+      </section>
 
-      <button type="submit" class="button button-primary button-block">シェア</button>
+      <div class="create-actions">
+        <button type="button" class="button button-block" id="try-play">遊んでみる</button>
+        <button type="submit" class="button button-primary button-block">シェア</button>
+      </div>
     </form>
   </main>
 

@@ -9,4 +9,14 @@ if (!bingo || !bingo.hasMarks) {
   document.title = `${bingo.title}の結果 | Share Bingo`;
   document.getElementById('bingo-title').textContent = bingo.title;
   renderBoard(document.getElementById('board'), bingo, bingo.marks);
+
+  const count = countBingo(bingo.size, bingo.marks);
+  const countEl = document.getElementById('bingo-count');
+  countEl.textContent = count > 0 ? `${count} BINGO!` : 'ビンゴはありませんでした';
+  countEl.classList.toggle('is-zero', count === 0);
+
+  if (bingo.comment) {
+    document.getElementById('comment-text').textContent = bingo.comment;
+    document.getElementById('comment-display').hidden = false;
+  }
 }
