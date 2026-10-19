@@ -14,7 +14,43 @@ const themePicker = document.getElementById('theme-picker');
 const previewTitle = document.getElementById('preview-title');
 const previewBoard = document.getElementById('preview-board');
 
-let theme = applyTheme(DEFAULT_THEME);
+// 入力内容は端末内に保存しておき、次に開いたときに復元する
+const DRAFT_KEY = 'bingo-generator:draft';
+
+function loadDraft() {
+  try {
+    return JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null') || {};
+  } catch {
+    return {};
+  }
+}
+
+function saveDraft() {
+  try {
+    localStorage.setItem(
+      DRAFT_KEY,
+      JSON.stringify({
+        title: titleInput.value,
+        size: sizeSelect.value,
+        free: freeToggle.checked,
+        center: centerTextInput.value,
+        items: itemsInput.value,
+        theme,
+      })
+    );
+  } catch {
+    // 保存できない環境では何もしない
+  }
+}
+
+const draft = loadDraft();
+if (typeof draft.title === 'string') titleInput.value = draft.title;
+if (SIZES.includes(Number(draft.size))) sizeSelect.value = String(draft.size);
+if (typeof draft.free === 'boolean') freeToggle.checked = draft.free;
+if (typeof draft.center === 'string') centerTextInput.value = draft.center;
+if (typeof draft.items === 'string') itemsInput.value = draft.items;
+
+let theme = applyTheme(draft.theme || DEFAULT_THEME);
 
 THEMES.forEach((t) => {
   const label = document.createElement('label');
@@ -117,6 +153,9 @@ function validBingo() {
 [sizeSelect, freeToggle].forEach((el) => el.addEventListener('change', updateStatus));
 [itemsInput, centerTextInput].forEach((el) => el.addEventListener('input', updateStatus));
 titleInput.addEventListener('input', updateStatus);
+// 各入力欄の処理のあとに保存する
+form.addEventListener('input', saveDraft);
+form.addEventListener('change', saveDraft);
 
 document.getElementById('try-play').addEventListener('click', () => {
   const bingo = validBingo();
