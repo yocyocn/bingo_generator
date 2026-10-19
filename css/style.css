@@ -682,20 +682,14 @@ button.cell {
   display: none;
 }
 
-/* ===== 作成ページへのリンク ===== */
-.create-link {
-  margin: 28px 0 0;
-  text-align: center;
+/* ===== 作成ページへのボタン ===== */
+.create-button {
+  margin-top: 12px;
 }
 
-.create-link a {
-  color: var(--text);
-  font-weight: 700;
-  text-underline-offset: 4px;
-}
-
-.create-link a::after {
-  content: " →";
+.comment-display + .create-button,
+.bingo-count + .create-button {
+  margin-top: 24px;
 }
 
 /* ===== エラー ===== */
