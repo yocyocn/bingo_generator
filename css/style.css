@@ -717,3 +717,7 @@ button.cell {
 .page-title[hidden] + .board {
   margin-top: 12px;
 }
+
+.main-wide > .page-title {
+  margin-bottom: 28px;
+}
