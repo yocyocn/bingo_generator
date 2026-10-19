@@ -40,19 +40,15 @@ function freeIndex(bingo) {
   return bingo.free === null ? -1 : centerIndex(bingo.size);
 }
 
-// 中央マスの内容が決まっている（FREEか、中央マス専用の項目がある）ときはその位置。なければ -1
-function fixedCenterIndex(bingo) {
-  return bingo.free !== null || bingo.center ? centerIndex(bingo.size) : -1;
-}
-
+// 中央マスはFREEか中央マス専用の項目になるので、項目の数はFREEの有無に関係なく決まる
 function requiredCount(bingo) {
-  return bingo.size * bingo.size - (fixedCenterIndex(bingo) >= 0 ? 1 : 0);
+  return bingo.size * bingo.size - (centerIndex(bingo.size) >= 0 ? 1 : 0);
 }
 
 // 盤面のマス配列を作る。中央以外に入力順で項目を入れ、足りない分は空白
 function buildCells(bingo) {
   const free = freeIndex(bingo);
-  const center = fixedCenterIndex(bingo);
+  const center = centerIndex(bingo.size);
   const cells = [];
   let next = 0;
   for (let i = 0; i < bingo.size * bingo.size; i++) {
