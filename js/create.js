@@ -44,7 +44,7 @@ THEMES.forEach((t) => {
 function getItems() {
   return itemsInput.value
     .split('\n')
-    .map((s) => s.trim())
+    .map((s) => truncate(s.trim(), MAX_ITEM_LENGTH))
     .filter((s) => s !== '');
 }
 
@@ -83,30 +83,20 @@ function updateStatus() {
     itemsCount.textContent += `（${need + 1}個目以降は使われません）`;
   }
 
-  // 20文字を超える行を表示
   itemsError.innerHTML = '';
-  const tooLong = items
-    .map((text, i) => ({ text, line: i + 1, len: charLength(text) }))
-    .filter((it) => it.len > MAX_ITEM_LENGTH);
-  tooLong.forEach((it) => {
-    const li = document.createElement('li');
-    li.textContent = `${it.line}個目「${it.text}」が${it.len}文字です（20文字まで）`;
-    itemsError.appendChild(li);
-  });
-  itemsInput.classList.toggle('is-invalid', tooLong.length > 0);
+  itemsInput.classList.remove('is-invalid');
 
   // プレビュー
   previewTitle.textContent = bingo.title || 'ビンゴ名';
   previewTitle.classList.toggle('is-placeholder', !bingo.title);
   const marks = [...Array(size * size)].map((_, i) => i === freeIndex(bingo));
   renderBoard(previewBoard, bingo, marks);
-
-  return tooLong.length === 0;
 }
 
 // 入力チェックをして、問題なければビンゴを返す
 function validBingo() {
-  let valid = updateStatus();
+  updateStatus();
+  let valid = true;
   const bingo = currentBingo();
 
   if (!bingo.title) {
