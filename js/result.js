@@ -6,12 +6,8 @@ if (!bingo || !bingo.hasMarks) {
   showLoadError('結果を読み込めませんでした。URLが正しいか確認してください。');
 } else {
   applyTheme(bingo.theme);
-  if (bingo.title) {
-    document.title = `${bingo.title}の結果 | Bingo Generator`;
-    document.getElementById('bingo-title').textContent = bingo.title;
-  } else {
-    document.getElementById('bingo-title').hidden = true;
-  }
+  if (bingo.title) document.title = `${bingo.title}の結果 | Bingo Generator`;
+  setPageTitle(document.getElementById('bingo-title'), bingo.title);
   renderBoard(document.getElementById('board'), bingo, bingo.marks);
 
   const count = countBingo(bingo.size, bingo.marks);

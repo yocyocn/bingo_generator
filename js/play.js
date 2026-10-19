@@ -17,12 +17,8 @@ if (!bingo) {
   showLoadError('ビンゴを読み込めませんでした。URLが正しいか確認してください。');
 } else {
   bingo.theme = applyTheme(bingo.theme);
-  if (bingo.title) {
-    document.title = `${bingo.title} | Bingo Generator`;
-    document.getElementById('bingo-title').textContent = bingo.title;
-  } else {
-    document.getElementById('bingo-title').hidden = true;
-  }
+  if (bingo.title) document.title = `${bingo.title} | Bingo Generator`;
+  setPageTitle(document.getElementById('bingo-title'), bingo.title);
 
   const countEl = document.getElementById('bingo-count');
   const commentInput = document.getElementById('comment');

@@ -150,15 +150,33 @@ function renderBoard(container, bingo, marks, onToggle) {
 
     if (onToggle && !cell.free) {
       el.type = 'button';
+      if (!cell.text) el.setAttribute('aria-label', '空白のマス');
       el.setAttribute('aria-pressed', String(marks[index]));
       el.addEventListener('click', () => {
         const marked = onToggle(index);
         el.classList.toggle('is-marked', marked);
         el.setAttribute('aria-pressed', String(marked));
       });
+    } else if (marks[index]) {
+      // 押せないマスは○が見えない人にも伝わるよう読み上げ用の文字を添える
+      const sr = document.createElement('span');
+      sr.className = 'visually-hidden';
+      sr.textContent = cell.text ? '（○）' : '空白のマス（○）';
+      el.appendChild(sr);
+    } else if (!cell.text) {
+      const sr = document.createElement('span');
+      sr.className = 'visually-hidden';
+      sr.textContent = '空白のマス';
+      el.appendChild(sr);
     }
     container.appendChild(el);
   });
+}
+
+// ビンゴ名がないときも見出しは残し、画面には出さず読み上げだけにする
+function setPageTitle(el, title) {
+  el.textContent = title || 'ビンゴ';
+  el.classList.toggle('visually-hidden', !title);
 }
 
 function showLoadError(message) {
@@ -217,10 +235,26 @@ function openShareModal(url, heading) {
     const status = modal.querySelector('.share-status');
     const close = () => {
       modal.hidden = true;
+      // 開く前にフォーカスしていたボタンへ戻す
+      modal.returnFocus?.focus();
     };
     modal.querySelectorAll('[data-close]').forEach((el) => el.addEventListener('click', close));
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !modal.hidden) close();
+      if (modal.hidden) return;
+      if (e.key === 'Escape') close();
+      // ポップアップの外へフォーカスが出ないようにする
+      if (e.key === 'Tab') {
+        const items = [...modal.querySelectorAll('button, input')];
+        const first = items[0];
+        const last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     });
     input.addEventListener('focus', () => input.select());
     modal.querySelector('.share-copy').addEventListener('click', async () => {
@@ -234,6 +268,7 @@ function openShareModal(url, heading) {
   title.hidden = !heading;
   modal.querySelector('.share-url').value = url;
   modal.querySelector('.share-status').textContent = '';
+  modal.returnFocus = document.activeElement;
   modal.hidden = false;
   modal.querySelector('.share-copy').focus();
 }
