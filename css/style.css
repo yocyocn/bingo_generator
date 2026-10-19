@@ -501,9 +501,9 @@ button.cell {
   overflow-wrap: anywhere;
 }
 
-.preview-title.is-placeholder {
-  color: var(--muted);
-  opacity: 0.6;
+.preview-title[hidden],
+.page-title[hidden] {
+  display: none;
 }
 
 .create-actions {
@@ -712,4 +712,8 @@ button.cell {
   .bingo-count.is-pop {
     animation: none;
   }
+}
+
+.page-title[hidden] + .board {
+  margin-top: 12px;
 }

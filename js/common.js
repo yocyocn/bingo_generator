@@ -78,7 +78,7 @@ function countBingo(size, marks) {
 //   x: 中央マスの項目（FREEなしのとき） / m: 結果（マスごとに0か1） / n: コメント
 function buildQuery({ title, size, items, theme, free, center }, marks, comment) {
   const params = new URLSearchParams();
-  params.set('t', title);
+  if (title) params.set('t', title);
   params.set('s', String(size));
   params.set('i', items.join('\n'));
   params.set('c', theme);
@@ -99,10 +99,10 @@ function pageUrl(page, query) {
 // URLからビンゴを読み込む。不正な場合は null
 function parseBingo(search) {
   const params = new URLSearchParams(search);
-  const title = params.get('t');
+  const title = (params.get('t') || '').trim();
   const size = Number(params.get('s'));
   const rawItems = params.get('i');
-  if (!title || !SIZES.includes(size) || rawItems === null) return null;
+  if (!SIZES.includes(size) || rawItems === null) return null;
 
   const items = rawItems
     .split('\n')

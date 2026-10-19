@@ -8,7 +8,6 @@ const freeField = document.getElementById('free-field');
 const centerTextField = document.getElementById('center-text-field');
 const centerTextInput = document.getElementById('center-text');
 const itemsInput = document.getElementById('items');
-const titleError = document.getElementById('title-error');
 const itemsCount = document.getElementById('items-count');
 const itemsError = document.getElementById('items-error');
 const themePicker = document.getElementById('theme-picker');
@@ -89,8 +88,8 @@ function updateStatus() {
   itemsInput.classList.remove('is-invalid');
 
   // プレビュー
-  previewTitle.textContent = bingo.title || 'ビンゴ名';
-  previewTitle.classList.toggle('is-placeholder', !bingo.title);
+  previewTitle.textContent = bingo.title;
+  previewTitle.hidden = !bingo.title;
   const marks = [...Array(size * size)].map((_, i) => i === freeIndex(bingo));
   renderBoard(previewBoard, bingo, marks);
 }
@@ -101,11 +100,6 @@ function validBingo() {
   let valid = true;
   const bingo = currentBingo();
 
-  if (!bingo.title) {
-    titleError.textContent = 'ビンゴ名を入力してください';
-    titleInput.classList.add('is-invalid');
-    valid = false;
-  }
   if (bingo.items.length === 0) {
     const li = document.createElement('li');
     li.textContent = '項目を1つ以上入力してください';
@@ -122,11 +116,7 @@ function validBingo() {
 
 [sizeSelect, freeToggle].forEach((el) => el.addEventListener('change', updateStatus));
 [itemsInput, centerTextInput].forEach((el) => el.addEventListener('input', updateStatus));
-titleInput.addEventListener('input', () => {
-  titleError.textContent = '';
-  titleInput.classList.remove('is-invalid');
-  updateStatus();
-});
+titleInput.addEventListener('input', updateStatus);
 
 document.getElementById('try-play').addEventListener('click', () => {
   const bingo = validBingo();
